@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "824529821534",
+    "project_id": "los-robotines",
+    "storage_bucket": "los-robotines.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:824529821534:android:050c93f1e6f2fb3eac79cf",
+        "android_client_info": {
+          "package_name": "com.losrobotines.controladamente"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyByYWAYacQyBpdtuSx9RZangyYD2CBLEh4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
