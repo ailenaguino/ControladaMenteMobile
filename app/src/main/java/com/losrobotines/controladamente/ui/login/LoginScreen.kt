@@ -1,9 +1,13 @@
 package com.losrobotines.controladamente.ui.login
 
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.content.Context
+import android.content.ContextWrapper
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Column
@@ -42,7 +46,7 @@ import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import com.losrobotines.controladamente.ui.signup.SignupScreen
 
-class LoginScreen2 : ComponentActivity() {
+class LoginScreen : ComponentActivity() {
     private lateinit var auth: FirebaseAuth
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -62,11 +66,20 @@ class LoginScreen2 : ComponentActivity() {
         }
     }
 
+    private fun Context.findActivity(): Activity {
+        var context = this
+        while (context is ContextWrapper) {
+            if (context is Activity) return context
+            context = context.baseContext
+        }
+        throw IllegalStateException("no activity")
+    }
+
     @OptIn(ExperimentalMaterial3Api::class)
     @SuppressLint("PrivateResource")
     @Composable
     fun LoginScreen(contextAplication: Context) {
-        var username by remember { mutableStateOf("") }
+        var email by remember { mutableStateOf("") }
         var password by remember { mutableStateOf("") }
 
         Column(
@@ -78,12 +91,12 @@ class LoginScreen2 : ComponentActivity() {
             Spacer(modifier = Modifier.height(0.dp))
 
             OutlinedTextField(
-                value = username,
-                onValueChange = { username = it },
+                value = email,
+                onValueChange = { email = it },
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(16.dp),
-                label = { Text("Ingrese su usuario ") },
+                label = { Text("Ingrese su email") },
             )
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -101,7 +114,25 @@ class LoginScreen2 : ComponentActivity() {
 
             Button(
                 onClick = {
-
+                    auth.signInWithEmailAndPassword(email, password)
+                        .addOnCompleteListener(findActivity()) { task ->
+                            if (task.isSuccessful) {
+                                Log.i("login", "signInWithEmail:success")
+                                val user = auth.currentUser
+                                Toast.makeText(
+                                    baseContext,
+                                    "Success!!",
+                                    Toast.LENGTH_SHORT,
+                                ).show()
+                            } else {
+                                Log.w("login", "signInWithEmail:failure", task.exception)
+                                Toast.makeText(
+                                    baseContext,
+                                    "Authentication failed.",
+                                    Toast.LENGTH_SHORT,
+                                ).show()
+                            }
+                        }
                 },
                 modifier = Modifier
                     .fillMaxWidth()
