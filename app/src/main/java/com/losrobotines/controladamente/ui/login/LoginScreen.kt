@@ -76,7 +76,7 @@ class LoginScreen : ComponentActivity() {
     }
 
     @OptIn(ExperimentalMaterial3Api::class)
-    @SuppressLint("PrivateResource")
+    @SuppressLint("PrivateResource", "NotConstructor")
     @Composable
     fun LoginScreen(contextAplication: Context) {
         var email by remember { mutableStateOf("") }
