@@ -1,15 +1,12 @@
 package com.losrobotines.controladamente
 
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.ktx.auth
-import com.google.firebase.ktx.Firebase
-import com.losrobotines.controladamente.data.AuthRepository
-import com.losrobotines.controladamente.data.AuthRepositoryImpl
+import com.losrobotines.controladamente.data.firebaseAuth.AuthRepository
+import com.losrobotines.controladamente.data.firebaseAuth.AuthRepositoryImpl
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
-import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)//alcance del modulo, en este caso que cualquiera pueda inyectarse este modulo

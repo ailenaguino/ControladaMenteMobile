@@ -59,7 +59,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.google.firebase.auth.FirebaseAuth
 import com.losrobotines.controladamente.R
-import com.losrobotines.controladamente.data.Resource
+import com.losrobotines.controladamente.data.firebaseAuth.Resource
 import com.losrobotines.controladamente.ui.AuthViewModel
 import com.losrobotines.controladamente.ui.Home
 import com.losrobotines.controladamente.ui.signup.SignupScreen
@@ -117,8 +117,6 @@ class LoginScreen : ComponentActivity() {
         var password by remember { mutableStateOf("") }
 
         val loginFlow = viewModel?.loginFlow?.collectAsState()
-
-
 
         Image(
             painterResource(id = R.drawable.img),
@@ -281,27 +279,6 @@ class LoginScreen : ComponentActivity() {
                 } else {
                     viewModel.login(email, password)
                 }
-                /*  auth.signInWithEmailAndPassword(email, password)
-                      .addOnCompleteListener(findActivity()) { task ->
-                          if (task.isSuccessful) {
-                              Log.i("login", "signInWithEmail:success")
-                              val user = auth.currentUser
-                              Toast.makeText(
-                                  baseContext,
-                                  "Success!!",
-                                  Toast.LENGTH_SHORT,
-                              ).show()
-                          } else {
-                              Log.w("login", "signInWithEmail:failure", task.exception)
-                              Toast.makeText(
-                                  baseContext,
-                                  "Authentication failed.",
-                                  Toast.LENGTH_SHORT,
-                              ).show()
-                          }
-                      }
-
-                 */
             },
             modifier = Modifier
                 .fillMaxWidth()
@@ -316,26 +293,6 @@ class LoginScreen : ComponentActivity() {
         }
     }
 
-    @Composable
-    @OptIn(ExperimentalMaterial3Api::class)
-    private fun password(password: String): String {
-        var password1 = password
-        OutlinedTextField(
-            value = password1,
-            onValueChange = { password1 = it },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(start = 16.dp, end = 16.dp),
-            shape = RoundedCornerShape(35.dp),
-            label = { Text("Ingrese su contraseña", color = mainColor) },
-            colors = TextFieldDefaults.outlinedTextFieldColors(
-                focusedBorderColor = mainColor,
-                unfocusedBorderColor = mainColor,
-                cursorColor = mainColor
-            )
-        )
-        return password1
-    }
 
 
 }

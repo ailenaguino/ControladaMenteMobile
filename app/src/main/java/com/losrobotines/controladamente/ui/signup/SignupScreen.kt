@@ -13,19 +13,15 @@ import androidx.activity.viewModels
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.ClickableText
 import androidx.compose.foundation.text.KeyboardOptions
@@ -35,10 +31,8 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DatePicker
-import androidx.compose.material3.DatePickerDefaults
 import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.DisplayMode
-import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
@@ -47,7 +41,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.SelectableDates
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -63,7 +56,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.input.key.Key.Companion.Calendar
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.AnnotatedString
@@ -75,19 +67,16 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import com.losrobotines.controladamente.R
-import com.losrobotines.controladamente.data.Resource
+import com.losrobotines.controladamente.data.firebaseAuth.Resource
 import com.losrobotines.controladamente.ui.AuthViewModel
 import com.losrobotines.controladamente.ui.login.LoginScreen
 import com.losrobotines.controladamente.ui.signup.ui.theme.ControladaMenteTheme
 import com.losrobotines.controladamente.ui.theme.mainColor
 import com.losrobotines.controladamente.ui.theme.secondaryColor
 import dagger.hilt.android.AndroidEntryPoint
-import java.time.DayOfWeek
 import java.time.Instant
-import java.time.LocalDate
 import java.time.ZoneId
-import java.time.ZoneOffset
-import java.util.TimeZone
+import java.time.format.DateTimeFormatter
 
 
 @AndroidEntryPoint
@@ -135,10 +124,8 @@ class SignupScreen : ComponentActivity() {
             modifier = Modifier
                 .fillMaxSize()
         ) {
-
-         //   DateInputSample()
-
             Spacer(modifier = Modifier.height(49.dp))
+
             Image(
                 painterResource(id = R.drawable.logo),
                 contentDescription = "LogoAPP",
@@ -149,7 +136,7 @@ class SignupScreen : ComponentActivity() {
             )
 
             Spacer(modifier = Modifier.height(0.dp))
-
+            
             OutlinedTextField(
                 value = userEmail,
                 onValueChange = { userEmail = it },
@@ -157,7 +144,7 @@ class SignupScreen : ComponentActivity() {
                     .fillMaxWidth()
                     .padding(start = 16.dp, end = 16.dp),
                 shape = RoundedCornerShape(35.dp),
-                label = { Text("Email", color = mainColor) },
+                label = { Text("Email"/*, color = mainColor*/) },
                 singleLine = true,
                 keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Email),
                 colors = TextFieldDefaults.outlinedTextFieldColors(
@@ -175,7 +162,7 @@ class SignupScreen : ComponentActivity() {
                     .fillMaxWidth()
                     .padding(start = 16.dp, end = 16.dp),
                 shape = RoundedCornerShape(35.dp),
-                label = { Text("Contraseña", color = mainColor) },
+                label = { Text("Contraseña"/*, color = mainColor*/) },
                 singleLine = true,
                 visualTransformation = PasswordVisualTransformation(),
                 colors = TextFieldDefaults.outlinedTextFieldColors(
@@ -194,7 +181,7 @@ class SignupScreen : ComponentActivity() {
                     .fillMaxWidth()
                     .padding(start = 16.dp, end = 16.dp),
                 shape = RoundedCornerShape(35.dp),
-                label = { Text("Nombre", color = mainColor) },
+                label = { Text("Nombre"/*, color = mainColor*/) },
                 singleLine = true,
                 colors = TextFieldDefaults.outlinedTextFieldColors(
                     focusedBorderColor = mainColor,
@@ -204,184 +191,12 @@ class SignupScreen : ComponentActivity() {
             )
 
             Spacer(modifier = Modifier.height(5.dp))
-//*******************************************************************************************************************************************************
-            var date by remember { mutableStateOf("") }
-            var isDropdownMenuVisibleCalen by remember { mutableStateOf(false) }
-            var isTextVisible by remember { mutableStateOf(false) }
-            var diaDialog by remember { mutableStateOf("") }
 
-            Box(modifier = Modifier.fillMaxWidth()) {
-                Row(
-                    modifier = Modifier.align(Alignment.Center),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    OutlinedTextField(
-                        value = date,
-                        onValueChange = { date = it },
-                        modifier = Modifier
-                            .weight(1f)
-                            .padding(start = 16.dp, end = 2.dp),
-                        shape = RoundedCornerShape(35.dp),
-                        label = { Text("Fecha de nacimiento", color = mainColor) },
-                        singleLine = true,
-                        enabled = false,
-                        colors = TextFieldDefaults.outlinedTextFieldColors(
-                            focusedBorderColor = mainColor,
-                            unfocusedBorderColor = mainColor,
-                            cursorColor = mainColor,
-                        ),
-                    )
-                    IconButton(
-                        onClick = {
-                            isDropdownMenuVisibleCalen = !isDropdownMenuVisibleCalen
-                            isTextVisible = false
-                        }
-                    ) {
-                        Icon(
-                            Icons.Default.DateRange,
-                            contentDescription = "calendar",
-                            tint = secondaryColor,
-                            modifier = Modifier
-                                .align(Alignment.CenterVertically)
-                                .padding(start = 1.dp, end = 11.dp)
-                                .size(40.dp)
-                        )
-                    }
-                }
-            }
+            SelectBirthday()
 
-            DropdownMenu(
-                expanded = isDropdownMenuVisibleCalen,
-                onDismissRequest = {
-                    isDropdownMenuVisibleCalen = false
-                    isTextVisible = true
-                }
-            ) {
-                calendario(date = date) {
-                    date = it
-                    isDropdownMenuVisibleCalen = false
-                    isTextVisible = true
-                }
-            }
-
-
-            /*   var date by remember { mutableStateOf("") }
-            var isDropdownMenuVisibleCalen by remember { mutableStateOf(false) }
-            var isTextVisible by remember { mutableStateOf(false) }
-            var diaDialog by remember { mutableStateOf("") }
-
-            Box(modifier = Modifier.fillMaxWidth()) {
-                Row(
-                    modifier = Modifier.align(Alignment.Center),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    OutlinedTextField(
-                        value = date,
-                        onValueChange = { date },
-                        modifier = Modifier
-                            .weight(1f)
-                            .padding(start = 16.dp, end = 2.dp),
-                        shape = RoundedCornerShape(35.dp),
-                        label = { Text("Fecha de nacimiento", color = mainColor) },
-                        singleLine = true,
-                        enabled = false, // desactivo la edición del campo,
-                        colors = TextFieldDefaults.outlinedTextFieldColors(
-                            focusedBorderColor = mainColor,
-                            unfocusedBorderColor = mainColor,
-                            cursorColor = mainColor,
-                        ),
-                    )
-                    IconButton(
-                        onClick = {
-                            isDropdownMenuVisibleCalen = !isDropdownMenuVisibleCalen
-                            isTextVisible = false // Ocultar el texto cuando se toca el botón
-                        }
-                    ) {
-                        Icon(
-                            Icons.Default.DateRange,
-                            contentDescription = "calendar",
-                            tint = secondaryColor,
-                            modifier = Modifier
-                                .align(Alignment.CenterVertically)
-                                .padding(start = 1.dp, end = 11.dp)
-                                .size(40.dp)
-                        )
-                    }
-                }
-            }
-            
-            DropdownMenu(
-                expanded = isDropdownMenuVisibleCalen,
-                onDismissRequest = {
-                    isDropdownMenuVisibleCalen = false
-                    isTextVisible = true
-                }
-
-            ) {
-                calendario(date = date) {
-                    date = it
-                    isDropdownMenuVisibleCalen = false
-                    isTextVisible = true
-                }
-            } */
-
-//*******************************************************************************************************************************************************
             Spacer(modifier = Modifier.height(13.dp))
 
-            val sexoList = arrayOf("ASASD", "FDFSFAD", "ZXCASDF")
-            var expanded by remember { mutableStateOf(false) }
-
-            ExposedDropdownMenuBox(
-                expanded = expanded,
-                onExpandedChange = {
-                    expanded = !expanded
-                },
-                modifier = Modifier.padding(start = 16.dp, end = 16.dp)
-            ) {
-                TextField(
-                    value = selectedSexo,
-                    onValueChange = {},
-                    label = {
-                        Text(text = "Sexo", color = mainColor) //
-                    },
-                    readOnly = true,
-                    trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
-                    shape = RoundedCornerShape(35.dp),
-                    colors = TextFieldDefaults.textFieldColors(
-                        cursorColor = mainColor, // Color del cursor
-                        focusedIndicatorColor = Color.Transparent,
-                        unfocusedIndicatorColor = Color.Transparent
-                    ),
-                    textStyle = TextStyle(color = mainColor),
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(start = 1.dp, end = 1.dp)
-                        .menuAnchor()
-                        .border(
-                            width = 1.dp,
-                            color = mainColor,
-                            shape = RoundedCornerShape(35.dp)
-                        )
-                )
-                ExposedDropdownMenu(
-                    expanded = expanded,
-                    onDismissRequest = { expanded = false },
-                ) {
-                    sexoList.forEach { specialty ->
-                        DropdownMenuItem(
-                            text = {
-                                Text(
-                                    text = specialty,
-                                )
-                            },
-                            onClick = {
-                                selectedSexo = specialty
-                                expanded = false
-                            }
-                        )
-                    }
-                }
-            }
+            selectedSexo = SelectSexoDropMenu(selectedSexo)
 
 
             Spacer(modifier = Modifier.height(55.dp))
@@ -419,7 +234,6 @@ class SignupScreen : ComponentActivity() {
                 )
             )
         }
-
         signupFlow?.value?.let {
             when (it) {
                 is Resource.Failure -> {
@@ -444,61 +258,98 @@ class SignupScreen : ComponentActivity() {
                 }
             }
         }
-
-
     }
+
 
     @OptIn(ExperimentalMaterial3Api::class)
-    @Composable
-    fun DatePickerSample() {
-        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            val datePickerState = rememberDatePickerState(initialSelectedDateMillis = 1578096000000)
-            DatePicker(state = datePickerState, modifier = Modifier.padding(16.dp))
-
-            Text("Selected date timestamp: ${datePickerState.selectedDateMillis ?: "no selection"}")
-        }
-    }
-
-    @OptIn(ExperimentalMaterial3Api::class)
-    @Composable
-    fun DateInputSample() {
-        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            val state = rememberDatePickerState(initialDisplayMode = DisplayMode.Input)
-            DatePicker(state = state, modifier = Modifier.padding(16.dp))
-
-            Text("Entered date timestamp: ${state.selectedDateMillis ?: "no input"}")
-        }
-    }
-
-
     @RequiresApi(Build.VERSION_CODES.O)
     @Composable
-    fun calendario(date: String, onDateSelected: (String) -> Unit) {
-        Column {
-            AndroidView(
-                factory = { context ->
-                    DatePicker(context).apply {
-                        layoutParams = ViewGroup.LayoutParams(
-                            ViewGroup.LayoutParams.MATCH_PARENT,
-                            ViewGroup.LayoutParams.MATCH_PARENT
-                        )
+    fun SelectBirthday() {
+        val date1 = remember { mutableStateOf("") }
+        val isOpen = remember { mutableStateOf(false) }
+
+        Row(verticalAlignment = Alignment.CenterVertically) {
+
+            OutlinedTextField(
+                readOnly = true,
+                value = date1.value,
+                label = { Text("Fecha de Nacimiento"/*, color = mainColor*/) },
+                onValueChange = {},
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(start = 16.dp, end = 2.dp),
+                shape = RoundedCornerShape(35.dp),
+                singleLine = true,
+                colors = TextFieldDefaults.outlinedTextFieldColors(
+                    focusedBorderColor = mainColor,
+                    unfocusedBorderColor = mainColor,
+                    cursorColor = mainColor,
+                )
+            )
+            IconButton(
+                onClick = { isOpen.value = true }
+            ) {
+                Icon(
+                    imageVector = Icons.Default.DateRange,
+                    contentDescription = "Calendar",
+                    tint = secondaryColor,
+                    modifier = Modifier
+                        .align(Alignment.CenterVertically)
+                        .padding(start = 1.dp, end = 11.dp, top=2.dp)
+                        .size(40.dp)
+                )
+            }
+        }
+
+        if (isOpen.value) {
+            CustomDatePickerDialog(
+                onAccept = {
+                    isOpen.value = false // close dialog
+                    if (it != null) { // Set the date
+                        date1.value = Instant
+                            .ofEpochMilli(it)
+                            .atZone(ZoneId.of("UTC"))
+                            .format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))
                     }
                 },
-                update = {
-                    it.setOnDateChangedListener { _, year, month, dayOfMonth ->
-                        val formattedDate = "$dayOfMonth - ${month + 1} - $year"
-                        onDateSelected(formattedDate)
-                    }
+                onCancel = {
+                    isOpen.value = false //close dialog
                 }
             )
         }
     }
-}
 
-/*
+
+    @OptIn(ExperimentalMaterial3Api::class)
+    @Composable
+    fun CustomDatePickerDialog(
+        onAccept: (Long?) -> Unit,
+        onCancel: () -> Unit
+    ) {
+        val state = rememberDatePickerState()
+
+        DatePickerDialog(
+            onDismissRequest = { },
+            confirmButton = {
+                Button(onClick = { onAccept(state.selectedDateMillis) }) {
+                    Text("Aceptar")
+                }
+            },
+            dismissButton = {
+                Button(onClick = onCancel) {
+                    Text("Cancelar")
+                }
+            }
+        ) {
+            DatePicker(state = state)
+        }
+    }
+
+    
     @Composable
     @OptIn(ExperimentalMaterial3Api::class)
-    fun SelectSexo(selectedSexo: String) {
+    private fun SelectSexoDropMenu(selectedSexo: String): String {
+        var selectedSexo1 = selectedSexo
         val sexoList = arrayOf("ASASD", "FDFSFAD", "ZXCASDF")
         var expanded by remember { mutableStateOf(false) }
 
@@ -509,56 +360,58 @@ class SignupScreen : ComponentActivity() {
             },
             modifier = Modifier.padding(start = 16.dp, end = 16.dp)
         ) {
-            TextField(
-                value = selectedSexo,
-                onValueChange = {},
-                label = {
-                    Text(text = "Sexo", color = mainColor) //
-                },
-                readOnly = true,
-                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
-                shape = RoundedCornerShape(35.dp),
-                colors = TextFieldDefaults.textFieldColors(
-                    cursorColor = mainColor, // Color del cursor
-                    focusedIndicatorColor = Color.Transparent,
-                    unfocusedIndicatorColor = Color.Transparent
-                ),
-                textStyle = TextStyle(color = mainColor),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(start = 1.dp, end = 1.dp)
-                    .menuAnchor()
-                    .border(
-                        width = 1.dp,
-                        color = mainColor,
-                        shape = RoundedCornerShape(35.dp)
-                    )  // prueba del borde
-            )
-            ExposedDropdownMenu(
-                expanded = expanded,
-                onDismissRequest = { expanded = false },
+            Surface(
+                color = Color.Transparent,
             ) {
-                sexoList.forEach { specialty ->
-                    DropdownMenuItem(
-                        text = {
-                            Text(
-                                text = specialty,
-                            )
-                        },
-                        onClick = {
-                            selectedSexo = specialty
-                            expanded = false
-                        }
-                    )
+                TextField(
+                    value = selectedSexo1,
+                    onValueChange = {},
+                    label = {
+                        Text(text = "Sexo", color = mainColor) //
+                    },
+                    readOnly = true,
+                    trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
+                    shape = RoundedCornerShape(35.dp),
+                    colors = TextFieldDefaults.textFieldColors(
+                        cursorColor = Color.Transparent, // Color del cursor
+                        focusedIndicatorColor = Color.Transparent,
+                        unfocusedIndicatorColor = Color.Transparent,
+                    ),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(start = 1.dp, end = 1.dp)
+                        .menuAnchor()
+                        .border(
+                            width = 1.dp,
+                            color = mainColor,
+                            shape = RoundedCornerShape(35.dp)
+                        )
+                )
+                ExposedDropdownMenu(
+                    expanded = expanded,
+                    onDismissRequest = { expanded = false },
+                ) {
+                    sexoList.forEach { specialty ->
+                        DropdownMenuItem(
+                            text = {
+                                Text(
+                                    text = specialty,
+                                )
+                            },
+                            onClick = {
+                                selectedSexo1 = specialty
+                                expanded = false
+                            }
+                        )
+                    }
                 }
             }
         }
+        return selectedSexo1
     }
-
 
 }
 
- */
 
 
 

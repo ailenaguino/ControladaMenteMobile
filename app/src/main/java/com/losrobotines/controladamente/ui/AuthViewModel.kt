@@ -3,8 +3,8 @@ package com.losrobotines.controladamente.ui
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.FirebaseUser
-import com.losrobotines.controladamente.data.AuthRepository
-import com.losrobotines.controladamente.data.Resource
+import com.losrobotines.controladamente.data.firebaseAuth.AuthRepository
+import com.losrobotines.controladamente.data.firebaseAuth.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -24,7 +24,7 @@ class AuthViewModel @Inject constructor(private val repository: AuthRepository) 
 
     init {
         if (repository.currentUser!=null){
-            _loginFlow.value=Resource.Success(repository.currentUser!!)
+            _loginFlow.value= Resource.Success(repository.currentUser!!)
         }
     }
 

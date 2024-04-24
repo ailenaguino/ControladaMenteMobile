@@ -1,4 +1,4 @@
-package com.losrobotines.controladamente.data.utils
+package com.losrobotines.controladamente.data.firebaseAuth.utils
 
 import com.google.android.gms.tasks.Task
 import kotlinx.coroutines.ExperimentalCoroutinesApi

@@ -1,4 +1,4 @@
-package com.losrobotines.controladamente.data
+package com.losrobotines.controladamente.data.firebaseAuth
 
 import com.google.firebase.auth.FirebaseUser
 

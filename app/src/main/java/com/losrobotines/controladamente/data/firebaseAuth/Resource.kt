@@ -1,4 +1,4 @@
-package com.losrobotines.controladamente.data
+package com.losrobotines.controladamente.data.firebaseAuth
 
 
 sealed class Resource<out R> {
